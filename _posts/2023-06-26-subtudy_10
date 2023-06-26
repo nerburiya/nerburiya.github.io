@@ -1,0 +1,69 @@
+---
+title:  "[숩터디] 4주차"
+excerpt: "Joonseok Lee 교수님의 Lecture 10. Transformers II 강의 요약"
+
+categories:
+  - Blog
+tags:
+  - [Blog, Deeplearning, Github, SNU]
+
+toc: true
+toc_sticky: true
+ 
+date: 2023-06-26
+last_modified_at: 2023-06-26
+---
+
+## 복습
+- Query : 현재의 context를 담고 있는 벡터, 디코더의 현재 상태
+- Key : Attention하려는 대상들이 Query와 얼마나 관련이 있는지 계산하기 위해 만들어진 벡터
+- Value : 가중치에 사용될 값
+- Transformers는 Query, Key, Value를 따로 가중치를 만들어서 사용함.
+
+# Token Aggregation
+- average pooling
+- Classification Token(CLS) : 처음에 아무 정보가 들어있지 않은 토큰을 하나 넣어서 Transformer를 통과시킨다. 평균을 담는 토큰이 출력됨. 출력된 토큰을 Classifier를 달아서 문장 단위의 예측을 실행
+
+# Inside the Transformer
+## Encoder
+### step1 : input embedding
+### step1.5 : Positional Encoing
+- 문장과 같이 순서가 중요하다고 생각되는 경우 문장에 순서를 넣어줌
+- No two different indices have same encoding
+- Adjacent position
+### step2 : Contextualizing the Embeddings
+- Query, Key, Value로 표현(각각의 가중치 행렬을 곱해줌)
+- Self attention을 실시 : z = softmax(Q * K^T / d^(1/2)) * V (T는 전치, d는 차원을 고려)
+- Query, Key, Value는 보통 입력보다 작은 차원으로 만들고 Z를 계산하고 그 이후에 가중치 행렬을 한 번 더 곱해서 입력과 같은 크기로 만들어준다.
+- Multi-head Self attention : 중의적 의미를 가질 수 있는 경우 Self attention을 여러 번 시행(예를 들어 지시 대명사 같이 지칭할 수 있는 것이 여러 가지가 가능한 경우), head 수는 데이터를 보고 결정하게 됨
+### step3 : Feed-forward Layer 
+- FC layer를 추가해준다.
+- Residual connection, layer normalization
+### 위 스텝을 여러번 쌓는다.
+
+## Decoder
+### step1 : decoder input
+- auto-regressively
+- Positional Encoing
+
+### step2 : Masked Multi-head Self-attention
+- 들어온 토큰 전체를 보는 것이 아니라 아직 만들지 않은 부분에 대해서는 mask를 씌워서 무시한다.
+
+### step3 : Encoder-decoder Attention
+- Encoder의 Key, Value를 가져와서 확인함
+- No masking
+
+### step4 : Feed-forward Layer 
+### 위 스텝을 여러 번 쌓는다.
+
+### step5: Linear Layer
+### step6: Softmax Layer
+
+# BERT(Bidirectional Encoder Representations from Transformers)
+- 어떤 문장에 속하는지에 대한 토큰을 추가함
+- Training task 1 : Masked Language Modeling (MLM)
+- Training task 2 : Next Sentence Prediction (NSP)
+
+# Transformer for Image Data
+- ViT(Vision Transformer) : 작은 이미지로 나눠서 token으로 사용
+- 대신 비용이 엄청나게 들었음
